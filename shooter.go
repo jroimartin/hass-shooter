@@ -65,6 +65,7 @@ func (hs *HassShooter) Close() error {
 func (hs *HassShooter) ListenAndServe() error {
 	logf("Logging into Home Assistant")
 	if err := hs.hassLogin(); err != nil {
+		return fmt.Errorf("could not log into hass: %w", err)
 	}
 	go func() {
 		for {
