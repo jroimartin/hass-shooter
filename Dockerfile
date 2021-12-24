@@ -2,10 +2,6 @@ FROM golang:1.17.5-alpine3.15 as builder
 
 WORKDIR /go/src/hass-shooter
 
-COPY go.mod go.sum ./
-
-RUN go mod download
-
 COPY . .
 
 RUN go build
