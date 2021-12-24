@@ -37,6 +37,7 @@ func main() {
 	}
 }
 
+// usage prints the command usage message and flags.
 func usage() {
 	fmt.Fprintf(os.Stderr, "usage: hass-shooter [flags]\n")
 	flag.PrintDefaults()
