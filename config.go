@@ -18,7 +18,7 @@ type Config struct {
 	ListenAddr      string `json:"listen_addr"`
 	RefreshTimeSecs int    `json:"refresh_time"`
 	MinIdleTimeSecs int    `json:"min_idle_time"`
-	PageTimeoutSecs int    `json:"page_timeout"`
+	TimeoutSecs     int    `json:"timeout"`
 }
 
 // Page represents a page to be captured.

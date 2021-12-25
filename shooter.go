@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+	"sync"
 	"time"
 
 	"github.com/go-rod/rod"
@@ -69,9 +70,7 @@ func (hs *HassShooter) ListenAndServe() error {
 	}
 	go func() {
 		for {
-			if err := hs.Refresh(); err != nil {
-				logf("Could not refresh cache: %v", err)
-			}
+			hs.refreshAll()
 			time.Sleep(time.Duration(hs.cfg.RefreshTimeSecs) * time.Second)
 		}
 	}()
@@ -80,34 +79,49 @@ func (hs *HassShooter) ListenAndServe() error {
 	return http.ListenAndServe(hs.cfg.ListenAddr, nil)
 }
 
-// Refresh refreshes the internal image cache.
-func (hs *HassShooter) Refresh() error {
-	// TODO(rm): capture pages in parallel.
+// refreshAll refreshes the internal image cache.
+func (hs *HassShooter) refreshAll() {
+	var wg sync.WaitGroup
 	for i, page := range hs.cfg.HassPages {
-		logf("Taking screenshot: %v", page.Path)
-		img, err := hs.screenshot(page)
-		if err != nil {
-			return fmt.Errorf("could not take screenshot: %w", err)
-		}
+		wg.Add(1)
+		go func(i int, page Page) {
+			defer wg.Done()
+			hs.refresh(i, page)
+		}(i, page)
+	}
+	wg.Wait()
+}
 
-		logf("Transforming image")
-		img, err = hs.transform(img)
-		if err != nil {
-			return fmt.Errorf("could not transform image: %w", err)
-		}
-
-		if err := hs.cache.Set(i, img); err != nil {
-			return fmt.Errorf("could not cache image: %w", err)
-		}
+// refresh refreshes the image of the internal image cache at index idx.
+func (hs *HassShooter) refresh(idx int, page Page) {
+	logf("Taking screenshot (%v)", page.Path)
+	img, err := hs.screenshot(page)
+	if err != nil {
+		logf("could not take screenshot: %v", err)
+		return
 	}
 
-	return nil
+	logf("Transforming image (%v)", page.Path)
+	img, err = hs.transform(img)
+	if err != nil {
+		logf("could not transform image: %v", err)
+		return
+	}
+
+	logf("Updating cache (%v)", page.Path)
+	if err := hs.cache.Set(idx, img); err != nil {
+		logf("could not cache image: %v", err)
+		return
+	}
 }
 
 // screenshot takes a screnshot of the specified page.
 func (hs *HassShooter) screenshot(page Page) ([]byte, error) {
+	timeout := time.Duration(hs.cfg.TimeoutSecs) * time.Second
+	browser := hs.browser.Timeout(timeout)
+
 	url := hs.cfg.HassBaseURL + page.Path
-	bpage, err := hs.browser.Page(proto.TargetCreateTarget{URL: url})
+	bpage, err := browser.Page(proto.TargetCreateTarget{URL: url})
 	if err != nil {
 		return nil, fmt.Errorf("could not open page: %w", err)
 	}
@@ -127,9 +141,8 @@ func (hs *HassShooter) screenshot(page Page) ([]byte, error) {
 		return nil, fmt.Errorf("could not set window size: %w", err)
 	}
 
-	timeout := time.Duration(hs.cfg.PageTimeoutSecs) * time.Second
 	idletime := time.Duration(hs.cfg.MinIdleTimeSecs) * time.Second
-	waitFcn := bpage.Timeout(timeout).WaitRequestIdle(idletime, nil, nil)
+	waitFcn := bpage.WaitRequestIdle(idletime, nil, nil)
 	waitFcn()
 
 	img, err := bpage.Screenshot(false, &proto.PageCaptureScreenshot{
@@ -145,6 +158,7 @@ func (hs *HassShooter) screenshot(page Page) ([]byte, error) {
 // transform transforms the provided PNG into a BMP suitable for e-ink
 // displays.
 func (hs *HassShooter) transform(png []byte) ([]byte, error) {
+	var buf bytes.Buffer
 	cmd := exec.Command(
 		"convert",
 		"png:-",
@@ -153,8 +167,7 @@ func (hs *HassShooter) transform(png []byte) ([]byte, error) {
 		"bmp:-",
 	)
 	cmd.Stdin = bytes.NewReader(png)
-	buf := &bytes.Buffer{}
-	cmd.Stdout = buf
+	cmd.Stdout = &buf
 	if err := cmd.Run(); err != nil {
 		return nil, fmt.Errorf("imagemagick error: %w", err)
 	}
@@ -163,8 +176,11 @@ func (hs *HassShooter) transform(png []byte) ([]byte, error) {
 
 // hassLogin logs into Home Assistant.
 func (hs *HassShooter) hassLogin() error {
+	timeout := time.Duration(hs.cfg.TimeoutSecs) * time.Second
+	browser := hs.browser.Timeout(timeout)
+
 	target := proto.TargetCreateTarget{URL: hs.cfg.HassBaseURL}
-	bpage, err := hs.browser.Page(target)
+	bpage, err := browser.Page(target)
 	if err != nil {
 		return fmt.Errorf("could not open page: %w", err)
 	}

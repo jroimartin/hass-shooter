@@ -104,8 +104,7 @@ func (cache *ImageCache) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(rm): add reference to official docs.
-	w.Header().Set("Transfer-Encoding", "identity")
+	w.Header().Set("Content-Length", strconv.Itoa(len(img)))
 
 	if _, err := io.Copy(w, NewImageReader(img)); err != nil {
 		logf("Could not write image: %v", err)
