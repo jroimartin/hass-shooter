@@ -163,7 +163,7 @@ func (hs *HassShooter) transform(png []byte) ([]byte, error) {
 		"convert",
 		"png:-",
 		"-monochrome",
-		"-rotate", fmt.Sprintf("%v", hs.cfg.Rotation),
+		"-rotate", fmt.Sprintf("%d", hs.cfg.Rotation),
 		"bmp:-",
 	)
 	cmd.Stdin = bytes.NewReader(png)

@@ -50,9 +50,11 @@ path of the page. The full captured URL is hass_base_url + hass_pages[i].path.
 "height" is the height of the generate image (usually, the height of the e-ink
 display).
 
+"rotation" is the rotation in degrees applied to the resulting images.
+
 "listen_addr" is the HTTP service address to listen for incoming requests.
 
-"refres_time" is the time in seconds between screenshots.
+"refresh_time" is the time in seconds between screenshots.
 
 "min_idle_time" is the minimum time in seconds without requests to consider a page to
 be loaded.
