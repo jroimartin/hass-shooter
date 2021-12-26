@@ -4,35 +4,35 @@ e-ink displays.
 
 Usage:
 
-  hass-shooter [flags]
+	hass-shooter [flags]
 
 The flags are:
 
-  -c string
-          configuration file (default "/data/options.json")
+	-c string
+		configuration file (default "/data/options.json")
 
 hass-shooter depends on Chromium and ImageMagick, so they must be installed
 first.
 
 The configuration file is a JSON file with the following format:
 
-{
-  "hass_base_url": "https://example.com",
-  "hass_token": "ACCESS_TOKEN",
-  "hass_pages": [
-    {
-      "path": "/lovelace/default_view",
-      "scale": 1
-    }
-  ],
-  "width": 480,
-  "height": 800,
-  "rotation": 0,
-  "listen_addr": ":8000",
-  "refresh_time": 60,
-  "min_idle_time": 5,
-  "timeout": 60
-}
+	{
+	  "hass_base_url": "https://example.com",
+	  "hass_token": "ACCESS_TOKEN",
+	  "hass_pages": [
+	    {
+	      "path": "/lovelace/default_view",
+	      "scale": 1
+	    }
+	  ],
+	  "width": 480,
+	  "height": 800,
+	  "rotation": 0,
+	  "listen_addr": ":8000",
+	  "refresh_time": 60,
+	  "min_idle_time": 5,
+	  "timeout": 60
+	}
 
 The following configuration parameters are supported:
 
