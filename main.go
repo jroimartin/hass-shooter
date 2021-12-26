@@ -1,7 +1,3 @@
-/*
-hass-shooter is a Home Assistant screenshot capture web server suitable for
-e-ink displays.
-*/
 package main
 
 import (
