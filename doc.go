@@ -60,5 +60,8 @@ display).
 be loaded.
 
 "timeout" is the timeout in seconds used by the headless browser.
+
+The screenshots are served in the path "/<idx>", where <idx> is the index of
+the entry in the "hass_pages" array. The path "/" is equivalent to "/0".
 */
 package main
