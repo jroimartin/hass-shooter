@@ -9,16 +9,17 @@ import (
 
 // Config contains the HassShooter configuration.
 type Config struct {
-	HassBaseURL     string `json:"hass_base_url"`
-	HassToken       string `json:"hass_token"`
-	HassPages       []Page `json:"hass_pages"`
-	Width           int    `json:"width"`
-	Height          int    `json:"height"`
-	Rotation        int    `json:"rotation"`
-	ListenAddr      string `json:"listen_addr"`
-	RefreshTimeSecs int    `json:"refresh_time"`
-	MinIdleTimeSecs int    `json:"min_idle_time"`
-	TimeoutSecs     int    `json:"timeout"`
+	HassBaseURL      string `json:"hass_base_url"`
+	HassToken        string `json:"hass_token"`
+	HassPages        []Page `json:"hass_pages"`
+	Width            int    `json:"width"`
+	Height           int    `json:"height"`
+	Rotation         int    `json:"rotation"`
+	ListenAddr       string `json:"listen_addr"`
+	IgnoreCertErrors bool   `json:"ignore_cert_errors"`
+	RefreshTimeSecs  int    `json:"refresh_time"`
+	MinIdleTimeSecs  int    `json:"min_idle_time"`
+	TimeoutSecs      int    `json:"timeout"`
 }
 
 // Page represents a page to be captured.

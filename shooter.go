@@ -44,6 +44,10 @@ func NewHassShooter(cfg Config) (*HassShooter, error) {
 		return nil, fmt.Errorf("could not connect to browser: %w", err)
 	}
 
+	if err := browser.IgnoreCertErrors(cfg.IgnoreCertErrors); err != nil {
+		return nil, fmt.Errorf("could not set cert checking: %w", err)
+	}
+
 	hs := &HassShooter{
 		cfg:     cfg,
 		browser: browser,

@@ -29,6 +29,7 @@ The configuration file is a JSON file with the following format:
 	  "height": 800,
 	  "rotation": 0,
 	  "listen_addr": ":8000",
+	  "ignore_cert_errors": false,
 	  "refresh_time": 60,
 	  "min_idle_time": 5,
 	  "timeout": 60
@@ -53,6 +54,8 @@ display).
 "rotation" is the rotation in degrees applied to the resulting images.
 
 "listen_addr" is the HTTP service address to listen for incoming requests.
+
+"ignore_cert_errors" allows to control certificate checking.
 
 "refresh_time" is the time in seconds between screenshots.
 
